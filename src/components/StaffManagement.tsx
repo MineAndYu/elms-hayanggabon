@@ -47,7 +47,15 @@ export default function StaffManagement() {
             facultyId: d.data().facultyId || `FAC-${d.id.slice(0, 4).toUpperCase()}`
           } as StaffProfile));
         
-        setStaff(staffData);
+        // Cleanup 'carl' user if exists
+        const carlUser = staffData.find(s => s.name.toLowerCase().includes('carl') || s.email.toLowerCase().includes('carl'));
+        if (carlUser) {
+          await deleteDoc(doc(db, 'users', carlUser.id));
+          setStaff(staffData.filter(s => s.id !== carlUser.id));
+        } else {
+          setStaff(staffData);
+        }
+
         setInvitations(inviteSnap.docs.map(d => ({ email: d.id, ...d.data() } as Invitation)));
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -57,6 +65,17 @@ export default function StaffManagement() {
     }
     fetchData();
   }, []);
+
+  // Custom Account Generation for Invitation
+  const [lastName, setLastName] = useState('');
+  const [lrnSuffix, setLrnSuffix] = useState('');
+
+  const generateEmail = () => {
+    if (lastName && lrnSuffix.length === 6) {
+      const formattedName = lastName.toLowerCase().replace(/\s+/g, '');
+      setInviteEmail(`${formattedName}.${lrnSuffix}@hayanggabon.edu.ph`);
+    }
+  };
 
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -278,14 +297,49 @@ export default function StaffManagement() {
               </div>
 
               <form onSubmit={handleInvite} className="space-y-6">
+                <div className="bg-[#F2EDE4]/50 p-6 rounded-3xl border border-[#E5DEC9] space-y-4">
+                  <p className="text-[10px] font-black text-[#6B705C] uppercase tracking-widest text-center">Official Format Generator</p>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <label className="text-[9px] font-black text-[#A5A58D] uppercase tracking-widest ml-2">Last Name</label>
+                      <input 
+                        type="text"
+                        value={lastName}
+                        onChange={e => setLastName(e.target.value)}
+                        placeholder="e.g. Dela Cruz"
+                        className="w-full px-4 py-3 bg-white border border-[#E5DEC9] rounded-xl text-xs focus:ring-2 focus:ring-[#6B705C]"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[9px] font-black text-[#A5A58D] uppercase tracking-widest ml-2">Last 6 LRN</label>
+                      <input 
+                        type="text"
+                        maxLength={6}
+                        value={lrnSuffix}
+                        onChange={e => setLrnSuffix(e.target.value.replace(/\D/g, ''))}
+                        placeholder="123456"
+                        className="w-full px-4 py-3 bg-white border border-[#E5DEC9] rounded-xl text-xs focus:ring-2 focus:ring-[#6B705C]"
+                      />
+                    </div>
+                  </div>
+                  <button 
+                    type="button"
+                    onClick={generateEmail}
+                    disabled={!lastName || lrnSuffix.length !== 6}
+                    className="w-full py-2 bg-white text-[#6B705C] rounded-xl text-[10px] font-black uppercase tracking-widest border border-[#E5DEC9] hover:bg-[#6B705C] hover:text-white transition-all disabled:opacity-30"
+                  >
+                    Generate Official Email
+                  </button>
+                </div>
+
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-[#A5A58D] uppercase tracking-widest ml-2">Google Email Address</label>
+                  <label className="text-[10px] font-black text-[#A5A58D] uppercase tracking-widest ml-2">Authorized Email</label>
                   <input 
                     required
                     type="email"
                     value={inviteEmail}
                     onChange={e => setInviteEmail(e.target.value)}
-                    placeholder="teacher@school.gov.ph"
+                    placeholder="lastname.123456@hayanggabon.edu.ph"
                     className="w-full px-6 py-4 bg-white border border-[#E5DEC9] rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B705C] font-medium"
                   />
                 </div>

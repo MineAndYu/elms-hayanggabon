@@ -302,30 +302,36 @@ export default function App() {
               <h1 className="text-2xl font-serif text-[#6B705C] font-bold tracking-tight leading-tight">Hayanggabon<br/>Elementary</h1>
             </Link>
 
-            <div className="space-y-2">
-              <p className="text-[10px] font-bold text-[#A5A58D] uppercase tracking-widest mb-4">Nav Main</p>
-              <NavItem to="/" icon={<LayoutDashboard size={20} />} label="Dashboard" />
-              <NavItem to="/attendance" icon={<UserCheck size={20} />} label="Attendance" />
-              <NavItem to="/students" icon={<Users size={20} />} label="Students" />
-              <NavItem to="/reports" icon={<BarChart3 size={20} />} label="Reports" />
-              <NavItem to="/calendar" icon={<Calendar size={20} />} label="Calendar" />
-              <NavItem to="/behavior" icon={<MessageSquare size={20} />} label="Behavior Logs" />
-              
+            <div className="space-y-4">
+              <div className="px-4 py-2">
+                <p className="text-[10px] font-black text-[#6B705C] uppercase tracking-[0.2em] mb-4 opacity-70">Academic Console</p>
+                <div className="space-y-1">
+                  <NavItem to="/" icon={<LayoutDashboard size={20} />} label="Faculty Hub" />
+                  <NavItem to="/attendance" icon={<UserCheck size={20} />} label="Daily Tracker" />
+                  <NavItem to="/students" icon={<Users size={20} />} label="Learner Registry" />
+                  <NavItem to="/behavior" icon={<MessageSquare size={20} />} label="Behavior Logs" />
+                  <NavItem to="/calendar" icon={<Calendar size={20} />} label="School Events" />
+                </div>
+              </div>
+
               {profile?.role === 'admin' && (
-                <>
-                  <p className="text-[10px] font-bold text-[#A5A58D] uppercase tracking-widest mt-8 mb-4">Admin Hub</p>
-                  <NavItem to="/staff" icon={<ShieldCheck size={20} />} label="Staff Management" />
-                  <div className="bg-[#D95D39] text-white p-4 rounded-2xl shadow-lg shadow-[#D95D39]/20 group">
-                    <p className="text-[10px] font-bold uppercase tracking-widest mb-2 opacity-70">Security</p>
-                    <Link 
-                      to="/emergency" 
-                      className="w-full text-left font-serif py-1 flex items-center justify-between hover:translate-x-1 transition-transform"
-                    >
-                      Notify Parents
-                      <div className="w-2 h-2 rounded-full bg-white animate-pulse"></div>
-                    </Link>
+                <div className="px-4 py-2 border-t border-[#E5DEC9] pt-6">
+                  <p className="text-[10px] font-black text-[#D95D39] uppercase tracking-[0.2em] mb-4">Authority Control</p>
+                  <div className="space-y-1">
+                    <NavItem to="/staff" icon={<ShieldCheck size={20} />} label="Staff Management" />
+                    <NavItem to="/reports" icon={<BarChart3 size={20} />} label="System Audit" />
+                    <div className="bg-[#D95D39]/5 text-[#D95D39] p-5 rounded-3xl border border-[#D95D39]/20 mt-4">
+                      <p className="text-[10px] font-black uppercase tracking-widest mb-2">Emergency Protocols</p>
+                      <Link 
+                        to="/emergency" 
+                        className="flex items-center gap-3 bg-[#D95D39] text-white py-3 px-4 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-[#A53F2B] transition-all shadow-lg shadow-[#D95D39]/20"
+                      >
+                        <AlertTriangle size={16} />
+                        Broadcast Alert
+                      </Link>
+                    </div>
                   </div>
-                </>
+                </div>
               )}
             </div>
           </div>
