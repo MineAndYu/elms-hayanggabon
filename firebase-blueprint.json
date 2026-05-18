@@ -8,6 +8,7 @@
         "name": { "type": "string" },
         "email": { "type": "string" },
         "role": { "type": "string", "enum": ["admin", "teacher"] },
+        "facultyId": { "type": "string" },
         "createdAt": { "type": "number" }
       },
       "required": ["name", "email", "role"]

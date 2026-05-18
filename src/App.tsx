@@ -36,13 +36,15 @@ import BehaviorLogger from './components/BehaviorLogger';
 import EmergencyCenter from './components/EmergencyCenter';
 import CalendarView from './components/CalendarView';
 import ParentPortal from './components/ParentPortal';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import StaffManagement from './components/StaffManagement';
+import { collection, query, where, getDocs, limit } from 'firebase/firestore';
 import { Student } from './types';
 
 interface UserProfile {
   name: string;
   email: string;
   role: 'admin' | 'teacher';
+  facultyId?: string;
 }
 
 export default function App() {
@@ -87,7 +89,8 @@ export default function App() {
           const newProfile: UserProfile = {
             name: user.displayName || 'Staff Member',
             email: user.email || '',
-            role: role
+            role: role,
+            facultyId: `FAC-${user.uid.slice(0, 4).toUpperCase()}`
           };
           await setDoc(docRef, newProfile);
           setProfile(newProfile);
@@ -270,6 +273,7 @@ export default function App() {
               {profile?.role === 'admin' && (
                 <>
                   <p className="text-[10px] font-bold text-[#A5A58D] uppercase tracking-widest mt-8 mb-4">Admin Hub</p>
+                  <NavItem to="/staff" icon={<ShieldCheck size={20} />} label="Staff Management" />
                   <div className="bg-[#D95D39] text-white p-4 rounded-2xl shadow-lg shadow-[#D95D39]/20 group">
                     <p className="text-[10px] font-bold uppercase tracking-widest mb-2 opacity-70">Security</p>
                     <Link 
@@ -330,6 +334,7 @@ export default function App() {
               <Route path="/reports" element={<ReportViewer />} />
               <Route path="/calendar" element={<CalendarView />} />
               <Route path="/behavior" element={<BehaviorLogger />} />
+              <Route path="/staff" element={profile?.role === 'admin' ? <StaffManagement /> : <Navigate to="/" />} />
               <Route path="/emergency" element={profile?.role === 'admin' ? <EmergencyCenter /> : <Navigate to="/" />} />
             </Routes>
           </AnimatePresence>
