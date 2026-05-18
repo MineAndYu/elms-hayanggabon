@@ -89,10 +89,23 @@ service cloud.firestore {
     // Collection Matches
     // -------------------------------------------------------------------------
 
+    function isInvited(email) {
+      return exists(/databases/$(database)/documents/invitations/$(email));
+    }
+
+    match /invitations/{email} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
     match /users/{userId} {
       allow read: if isSignedIn() && (request.auth.uid == userId || isAdmin());
-      // Admin create or anyone create if no users exist (for initial setup)
-      allow create: if isSignedIn() && (isAdmin() || !exists(/databases/$(database)/documents/users/bootstrap)) && isValidUser(incoming()); 
+      // Admin can create anywhere, or user can create if they are the first or have an invitation
+      allow create: if isSignedIn() && (
+        isAdmin() || 
+        !exists(/databases/$(database)/documents/users/bootstrap) ||
+        isInvited(request.auth.token.email)
+      ) && isValidUser(incoming()); 
       allow update: if (isAdmin() || (request.auth.uid == userId && incoming().role == existing().role)) && isValidUser(incoming());
       allow delete: if isAdmin() && userId != request.auth.uid;
     }

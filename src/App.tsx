@@ -84,6 +84,12 @@ export default function App() {
           if (!bootstrapSnap.exists()) {
             role = 'admin';
             await setDoc(bootstrapRef, { initialized: true });
+          } else if (user.email) {
+            // Check for pre-authorization
+            const inviteDoc = await getDoc(doc(db, 'invitations', user.email.toLowerCase()));
+            if (inviteDoc.exists()) {
+              role = inviteDoc.data().role as 'admin' | 'teacher';
+            }
           }
 
           const newProfile: UserProfile = {
@@ -104,9 +110,31 @@ export default function App() {
     return () => unsubscribe();
   }, []);
 
-  const login = () => {
-    const provider = new GoogleAuthProvider();
-    signInWithPopup(auth, provider);
+  const [adminLoading, setAdminLoading] = useState(false);
+  const [adminError, setAdminError] = useState<string | null>(null);
+
+  const login = async () => {
+    setAdminLoading(true);
+    setAdminError(null);
+    try {
+      const provider = new GoogleAuthProvider();
+      // Force select account to help with multiple accounts
+      provider.setCustomParameters({ prompt: 'select_account' });
+      await signInWithPopup(auth, provider);
+    } catch (err: any) {
+      console.error("Admin login error:", err);
+      let msg = "Failed to sign in.";
+      if (err.code === 'auth/popup-blocked') {
+        msg = "The popup was blocked by your browser. Please allow popups for this site.";
+      } else if (err.code === 'auth/unauthorized-domain') {
+        msg = "This domain is not authorized in Firebase. Please add this domain to the 'Authorized domains' in the Firebase Console.";
+      } else if (err.code === 'auth/popup-closed-by-user') {
+        msg = "Sign-in cancelled. Please try again.";
+      }
+      setAdminError(msg);
+    } finally {
+      setAdminLoading(false);
+    }
   };
 
   const logout = () => {
@@ -209,13 +237,26 @@ export default function App() {
             </div>
             
             {loginRole === 'admin' ? (
-              <button
-                onClick={login}
-                className="w-full flex items-center justify-center gap-3 bg-[#6B705C] text-white py-5 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-[#433E37] transition-all active:scale-[0.98] shadow-xl shadow-[#6B705C]/20"
-              >
-                <ShieldCheck className="w-5 h-5" />
-                Sign in with Faculty ID
-              </button>
+              <div className="space-y-4">
+                <button
+                  onClick={login}
+                  disabled={adminLoading}
+                  className="w-full flex items-center justify-center gap-3 bg-[#6B705C] text-white py-5 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-[#433E37] transition-all active:scale-[0.98] shadow-xl shadow-[#6B705C]/20 disabled:opacity-50"
+                >
+                  <ShieldCheck className="w-5 h-5" />
+                  {adminLoading ? 'Authenticating Personnel...' : 'Sign in with Faculty ID'}
+                </button>
+                {adminError && (
+                  <div className="p-4 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-3 text-red-600">
+                    <AlertTriangle size={16} className="shrink-0" />
+                    <p className="text-[10px] font-bold uppercase tracking-tight leading-tight">{adminError}</p>
+                  </div>
+                )}
+                <p className="text-[10px] text-center text-[#A5A58D] font-bold uppercase tracking-widest leading-loose">
+                  Ensure pop-ups are enabled.<br/>
+                  First faculty member to sign in<br/>will be assigned as Administrator.
+                </p>
+              </div>
             ) : (
               <form onSubmit={handleParentLogin} className="space-y-4">
                 <div className="space-y-2">

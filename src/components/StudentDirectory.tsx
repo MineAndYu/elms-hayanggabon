@@ -3,7 +3,7 @@ import { collection, query, getDocs, addDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { handleFirestoreError, OperationType } from '../lib/firebaseUtils';
 import { Student } from '../types';
-import { Plus, User, Mail, Phone, GraduationCap, X, AlertTriangle } from 'lucide-react';
+import { Plus, User, Mail, Phone, GraduationCap, X, AlertTriangle, ShieldCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Link } from 'react-router-dom';
 
@@ -92,6 +92,10 @@ export default function StudentDirectory() {
         <div>
           <h1 className="text-7xl font-serif text-[#6B705C] font-black tracking-tighter">Student Registry</h1>
           <p className="text-[#A5A58D] font-serif italic text-xl mt-2">Managing the future generations of Hayanggabon ES</p>
+          <div className="mt-4 flex items-center gap-2 text-[10px] font-black text-[#6B705C] uppercase tracking-widest bg-[#F2EDE4] px-4 py-2 rounded-full w-fit border border-[#E5DEC9]">
+             <ShieldCheck size={12} />
+             Student profiles act as their digital accounts for parent access
+          </div>
         </div>
         
         <button 
