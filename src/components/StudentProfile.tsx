@@ -90,7 +90,7 @@ export default function StudentProfile() {
                  <span className="px-3 py-1 bg-[#F1F3E9] text-[#6B705C] text-[10px] rounded-full border border-[#D1D9B5] font-black uppercase tracking-widest">
                     Grade {student.grade}
                  </span>
-                 <span className="text-[10px] font-black text-[#A5A58D] uppercase tracking-[0.2em] opacity-60">REF: {student.studentId}</span>
+                 <span className="text-[10px] font-black text-[#A5A58D] uppercase tracking-[0.2em] opacity-60">LRN: {student.studentId}</span>
               </div>
             </div>
 

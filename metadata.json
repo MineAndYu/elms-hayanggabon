@@ -1,6 +1,6 @@
 {
-  "name": "EduTrack Pro: School MS",
-  "description": "Comprehensive school management system for tracking attendance, behavior, and automated parent notifications.",
+  "name": "Hayanggabon Elementary School",
+  "description": "official school management system for Hayanggabon Elementary School, tracking student LRN, attendance, and parent-teacher communication.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

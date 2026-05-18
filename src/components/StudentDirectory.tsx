@@ -41,6 +41,30 @@ export default function StudentDirectory() {
     e.preventDefault();
     setSubmitting(true);
     setError(null);
+
+    // Validation
+    const lrnRegex = /^\d{12}$/;
+    const phoneRegex = /^(09|\+639)\d{9}$/;
+    const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+
+    if (!lrnRegex.test(newStudent.studentId)) {
+      setError("LRN must be exactly 12 digits.");
+      setSubmitting(false);
+      return;
+    }
+
+    if (!phoneRegex.test(newStudent.parentPhone)) {
+      setError("Invalid Philippine phone number (e.g., 09123456789 or +639123456789)");
+      setSubmitting(false);
+      return;
+    }
+
+    if (!gmailRegex.test(newStudent.parentEmail)) {
+      setError("Please use a valid Gmail address (@gmail.com)");
+      setSubmitting(false);
+      return;
+    }
+
     try {
       const studentData = {
         ...newStudent,
@@ -67,7 +91,7 @@ export default function StudentDirectory() {
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
           <h1 className="text-7xl font-serif text-[#6B705C] font-black tracking-tighter">Student Registry</h1>
-          <p className="text-[#A5A58D] font-serif italic text-xl mt-2">Managing the future generations of Oakwood</p>
+          <p className="text-[#A5A58D] font-serif italic text-xl mt-2">Managing the future generations of Hayanggabon ES</p>
         </div>
         
         <button 
@@ -105,7 +129,7 @@ export default function StudentDirectory() {
                     <span className="px-3 py-1 bg-[#F1F3E9] text-[#6B705C] text-[10px] rounded-full border border-[#D1D9B5] font-black uppercase tracking-widest">
                        Grade {student.grade}
                     </span>
-                    <span className="text-[10px] font-black text-[#A5A58D] uppercase tracking-widest opacity-60">ID: {student.studentId}</span>
+                    <span className="text-[10px] font-black text-[#A5A58D] uppercase tracking-widest opacity-60">LRN: {student.studentId}</span>
                   </div>
                 </div>
 
@@ -161,7 +185,7 @@ export default function StudentDirectory() {
                       disabled={submitting}
                     />
                     <InputField 
-                      label="Academic ID" 
+                      label="Student LRN (12 digits)" 
                       value={newStudent.studentId} 
                       onChange={v => setNewStudent(p => ({ ...p, studentId: v }))} 
                       icon={<GraduationCap size={18} />}

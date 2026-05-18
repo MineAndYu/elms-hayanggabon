@@ -115,10 +115,10 @@ export default function AttendanceManager() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-[#F2EDE4]/30">
-                <th className="px-10 py-6 text-[11px] font-black text-[#A5A58D] uppercase tracking-[0.2em]">Full Member Name</th>
-                <th className="px-10 py-6 text-[11px] font-black text-[#A5A58D] uppercase tracking-[0.2em]">Academic Level</th>
+                <th className="px-10 py-6 text-[11px] font-black text-[#A5A58D] uppercase tracking-[0.2em]">Learner Name</th>
+                <th className="px-10 py-6 text-[11px] font-black text-[#A5A58D] uppercase tracking-[0.2em]">Grade Level</th>
                 <th className="px-10 py-6 text-[11px] font-black text-[#A5A58D] uppercase tracking-[0.2em]">Current Status</th>
-                <th className="px-10 py-6 text-[11px] font-black text-[#A5A58D] uppercase tracking-[0.2em] text-right">Commit Action</th>
+                <th className="px-10 py-6 text-[11px] font-black text-[#A5A58D] uppercase tracking-[0.2em] text-right">Action</th>
               </tr>
             </thead>
             <tbody className="text-sm">
@@ -127,7 +127,7 @@ export default function AttendanceManager() {
                   <td className="px-10 py-7">
                     <div>
                       <p className="font-bold text-[#433E37] text-base">{student.name}</p>
-                      <p className="text-[10px] text-[#A5A58D] font-black tracking-widest mt-1 opacity-60">REF: {student.studentId}</p>
+                      <p className="text-[10px] text-[#A5A58D] font-black tracking-widest mt-1 opacity-60">LRN: {student.studentId}</p>
                     </div>
                   </td>
                   <td className="px-10 py-7">
