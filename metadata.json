@@ -1,0 +1,8 @@
+{
+  "name": "EduTrack Pro: School MS",
+  "description": "Comprehensive school management system for tracking attendance, behavior, and automated parent notifications.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

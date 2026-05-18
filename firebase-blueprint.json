@@ -1,0 +1,75 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "System user (Teacher or Admin)",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "teacher"] },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["name", "email", "role"]
+    },
+    "Student": {
+      "title": "Student",
+      "description": "Student in the school",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "studentId": { "type": "string" },
+        "grade": { "type": "string" },
+        "parentPhone": { "type": "string" },
+        "parentEmail": { "type": "string" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["name", "studentId", "grade", "parentPhone", "parentEmail"]
+    },
+    "AttendanceRecord": {
+      "title": "Attendance Record",
+      "description": "Daily attendance status for a student",
+      "type": "object",
+      "properties": {
+        "studentId": { "type": "string" },
+        "status": { "type": "string", "enum": ["present", "absent", "tardy"] },
+        "date": { "type": "string", "format": "date" },
+        "timestamp": { "type": "number" },
+        "markedBy": { "type": "string" }
+      },
+      "required": ["studentId", "status", "date", "timestamp", "markedBy"]
+    },
+    "BehaviorLog": {
+      "title": "Behavior Log",
+      "description": "Teacher comments on student behavior",
+      "type": "object",
+      "properties": {
+        "studentId": { "type": "string" },
+        "teacherId": { "type": "string" },
+        "comment": { "type": "string" },
+        "timestamp": { "type": "number" },
+        "date": { "type": "string", "format": "date" }
+      },
+      "required": ["studentId", "teacherId", "comment", "timestamp", "date"]
+    },
+    "EmergencyClosure": {
+      "title": "Emergency Closure",
+      "description": "Notifications about school closures",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "message": { "type": "string" },
+        "sentAt": { "type": "number" },
+        "senderId": { "type": "string" }
+      },
+      "required": ["title", "message", "sentAt", "senderId"]
+    }
+  },
+  "firestore": {
+    "users": { "schema": "User", "description": "Collection of system users" },
+    "students": { "schema": "Student", "description": "Collection of students" },
+    "attendance": { "schema": "AttendanceRecord", "description": "Collection of attendance records" },
+    "behaviorLogs": { "schema": "BehaviorLog", "description": "Collection of behavior logs" },
+    "emergencyClosures": { "schema": "EmergencyClosure", "description": "Collection of emergency notifications" }
+  }
+}

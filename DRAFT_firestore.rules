@@ -1,0 +1,128 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // -------------------------------------------------------------------------
+    // Global Safety Net
+    // -------------------------------------------------------------------------
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // -------------------------------------------------------------------------
+    // Global Helpers
+    // -------------------------------------------------------------------------
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function currentUser() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && currentUser().role == 'admin';
+    }
+
+    function isTeacher() {
+      return isSignedIn() && currentUser().role == 'teacher';
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // -------------------------------------------------------------------------
+    // Entity Validations
+    // -------------------------------------------------------------------------
+    function isValidUser(data) {
+      return data.keys().hasAll(['name', 'email', 'role']) &&
+             data.name is string && data.name.size() <= 100 &&
+             data.email is string && data.email.size() <= 100 &&
+             data.role in ['admin', 'teacher'];
+    }
+
+    function isValidStudent(data) {
+      return data.keys().hasAll(['name', 'studentId', 'grade', 'parentPhone', 'parentEmail']) &&
+             data.name is string && data.name.size() <= 100 &&
+             data.studentId is string && data.studentId.size() <= 50 &&
+             data.grade is string && data.grade.size() <= 20 &&
+             data.parentPhone is string && data.parentPhone.size() <= 20 &&
+             data.parentEmail is string && data.parentEmail.size() <= 100;
+    }
+
+    function isValidAttendance(data) {
+      return data.keys().hasAll(['studentId', 'status', 'date', 'timestamp', 'markedBy']) &&
+             data.studentId is string &&
+             data.status in ['present', 'absent', 'tardy'] &&
+             data.date is string &&
+             data.timestamp is number &&
+             data.markedBy == request.auth.uid;
+    }
+
+    function isValidBehaviorLog(data) {
+      return data.keys().hasAll(['studentId', 'teacherId', 'comment', 'timestamp', 'date']) &&
+             data.studentId is string &&
+             data.teacherId == request.auth.uid &&
+             data.comment is string && data.comment.size() <= 2000 &&
+             data.timestamp is number &&
+             data.date is string;
+    }
+
+    function isValidEmergencyClosure(data) {
+      return data.keys().hasAll(['title', 'message', 'sentAt', 'senderId']) &&
+             data.title is string && data.title.size() <= 200 &&
+             data.message is string && data.message.size() <= 5000 &&
+             data.sentAt is number &&
+             data.senderId == request.auth.uid;
+    }
+
+    // -------------------------------------------------------------------------
+    // Collection Matches
+    // -------------------------------------------------------------------------
+
+    match /users/{userId} {
+      allow read: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+      allow create: if isSignedIn() && (isAdmin() || !exists(/databases/$(database)/documents/users/bootstrap)); // Bootstrap logic or admin create
+      allow update: if isAdmin() && isValidUser(incoming()) && 
+                    incoming().role == existing().role; // Cannot change own role without admin
+      allow delete: if isAdmin() && userId != request.auth.uid; // Cannot delete self
+    }
+
+    match /students/{studentId} {
+      allow read: if isSignedIn();
+      allow create: if isAdmin() && isValidStudent(incoming());
+      allow update: if isAdmin() && isValidStudent(incoming());
+      allow delete: if isAdmin();
+    }
+
+    match /attendance/{atId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidAttendance(incoming());
+      allow update: if (isAdmin() || (isTeacher() && existing().markedBy == request.auth.uid)) && 
+                    isValidAttendance(incoming());
+      allow delete: if isAdmin();
+    }
+
+    match /behaviorLogs/{logId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidBehaviorLog(incoming());
+      allow update: if (isAdmin() || (isTeacher() && existing().teacherId == request.auth.uid)) && 
+                    isValidBehaviorLog(incoming());
+      allow delete: if isAdmin();
+    }
+
+    match /emergencyClosures/{ecId} {
+      allow read: if isSignedIn();
+      allow create: if isAdmin() && isValidEmergencyClosure(incoming());
+      allow delete: if isAdmin();
+    }
+  }
+}
